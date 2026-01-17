@@ -32,9 +32,13 @@ model Albums {
   title       String
   description String
   photoCount  Int      @default(0)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
-  user_id String
-  User    User   @relation(fields: [user_id], references: [id])
+  userId String
+  User    User   @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "idx_user_id")
 }

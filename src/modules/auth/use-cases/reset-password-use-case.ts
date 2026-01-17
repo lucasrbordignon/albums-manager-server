@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { AppError } from "../../../shared/errors/AppError";
-import { IUserRepository } from "../../../shared/interfaces/IUserRepository";
-import { IPasswordResetTokenRepository } from "../../../shared/interfaces/IPasswordResetTokenRepository";
-import { hashPassword } from "../../../shared/utils/hash";
-import { hashOtp } from "../../../shared/utils/hashOtp";
+import { AppError } from "@/shared/errors/AppError";
+import { IUserRepository } from "@/shared/interfaces/IUserRepository";
+import { IPasswordResetTokenRepository } from "@/shared/interfaces/IPasswordResetTokenRepository";
+import { hashPassword } from "@/shared/utils/hash";
+import { hashOtp } from "@/shared/utils/hashOtp";
 
 interface ResetPasswordRequest {
   email: string;

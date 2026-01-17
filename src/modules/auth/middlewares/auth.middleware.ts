@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { env } from '../../../config/env';
-import { AppError } from '../../../shared/errors/AppError';
+import { env } from '@/config/env';
+import { AppError } from '@/shared/errors/AppError';
 
 interface TokenPayload extends JwtPayload {
   sub: string;

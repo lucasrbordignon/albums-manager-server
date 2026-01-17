@@ -32,6 +32,9 @@ services:
     container_name: albuns-api
     restart: unless-stopped
     command: npm run dev
+    volumes:
+      - .:/app
+      - /app/node_modules
     ports:
       - "3333:3333"
     env_file:

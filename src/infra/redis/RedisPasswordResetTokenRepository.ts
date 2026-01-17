@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { IPasswordResetTokenRepository } from "../../shared/interfaces/IPasswordResetTokenRepository";
+import { IPasswordResetTokenRepository } from "@/shared/interfaces/IPasswordResetTokenRepository";
 
 export class RedisPasswordResetTokenRepository
 	implements IPasswordResetTokenRepository

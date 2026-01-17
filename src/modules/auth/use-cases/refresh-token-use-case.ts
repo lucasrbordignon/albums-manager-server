@@ -1,5 +1,5 @@
-import { AppError } from '../../../shared/errors/AppError';
-import { generateToken } from '../../../shared/utils/jwt';
+import { AppError } from '@/shared/errors/AppError';
+import { generateToken } from '@/shared/utils/jwt';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 
 export class RefreshTokenUseCase {

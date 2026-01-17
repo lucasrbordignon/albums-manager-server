@@ -1,8 +1,8 @@
-import { RedisPasswordResetTokenRepository } from "../../../infra/redis/RedisPasswordResetTokenRepository";
-import { IEmailService } from "../../../shared/interfaces/IEmailService";
-import { IUserRepository } from "../../../shared/interfaces/IUserRepository";
-import { generateOTP } from "../../../shared/utils/generateOTP";
-import { hashOtp } from "../../../shared/utils/hashOtp";
+import { RedisPasswordResetTokenRepository } from "@/infra/redis/RedisPasswordResetTokenRepository";
+import { IEmailService } from "@/shared/interfaces/IEmailService";
+import { IUserRepository } from "@/shared/interfaces/IUserRepository";
+import { generateOTP } from "@/shared/utils/generateOTP";
+import { hashOtp } from "@/shared/utils/hashOtp";
 
 interface ForgotPasswordRequest {
 	email: string;
