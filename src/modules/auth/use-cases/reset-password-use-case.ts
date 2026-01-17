@@ -5,7 +5,6 @@ import { IPasswordResetTokenRepository } from "../../../shared/interfaces/IPassw
 import { hashPassword } from "../../../shared/utils/hash";
 import { hashOtp } from "../../../shared/utils/hashOtp";
 
-
 interface ResetPasswordRequest {
   email: string;
   otp: string;
