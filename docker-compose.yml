@@ -35,6 +35,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./uploads:/app/uploads
+    environment:
+      - UPLOAD_DIR=/app/uploads
     ports:
       - "3333:3333"
     env_file:

@@ -8,7 +8,11 @@ import { Photo } from '@/generated/prisma/client'
 export class PhotosRepository implements IPhotosRepository {
   async create(data: CreatePhotoDTO): Promise<Photo> {
     return prisma.photo.create({
-      data
+      data: {
+        ...data,
+        hash: data.hash ?? '',
+        description: data.description ?? null
+      }
     })
   }
 
@@ -28,6 +32,15 @@ export class PhotosRepository implements IPhotosRepository {
       },
       data: {
         deletedAt: new Date()
+      }
+    })
+  }
+
+  async findByHash(hash: string): Promise<Photo | null> {
+    return prisma.photo.findFirst({
+      where: {
+        hash,
+        deletedAt: null
       }
     })
   }

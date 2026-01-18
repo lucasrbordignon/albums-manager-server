@@ -7,4 +7,6 @@ export interface CreatePhotoDTO {
   filePath: string
   dominantColor?: string
   albumId?: string
+  thumbnailPath?: string
+  hash?: string
 }

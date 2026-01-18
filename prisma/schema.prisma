@@ -60,6 +60,8 @@ model Photo {
   sizeInBytes     Int
   mimeType        String
   filePath        String   @map("file_path")
+  thumbnailPath   String?  @map("thumbnail_path")
+  hash            String?   @unique
 
   dominantColor   String?
 
