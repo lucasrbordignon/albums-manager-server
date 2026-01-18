@@ -4,6 +4,7 @@ import { CreateAlbumUseCase } from '../use-cases/create-album-use-case'
 import { AlbumsRepository } from '../repositories/albums.repository'
 import { FindAlbumByIdUseCase } from '../use-cases/find-album-by-id-use-case'
 import { UpdateAlbumUseCase } from '../use-cases/update-album-use-case'
+import type { ApiResponse } from '@/shared/errors/errorHandler';
 import { FindAlbumsByUserIdUseCase } from '../use-cases/find-albums-by-user-use-case'
 import { updateAlbumSchema } from '../schemas/updateAlbum.schema'
 import { DeleteAlbumUseCase } from '../use-cases/delete-album-use-case'
@@ -29,12 +30,13 @@ export class AlbumsController {
     const data = createAlbumSchema.parse(req.body);
     try {
       const album = await this.createAlbumUseCase.execute(data);
-      return res.status(201).json({
-        status: 'success',
+      const response: ApiResponse<typeof album> = {
+        success: true,
         message: 'Album created successfully',
         data: album,
-        errors: null
-      });
+        errors: null,
+      };
+      return res.status(201).json(response);
     } catch (error) {
       return next(error);
     }
@@ -44,12 +46,13 @@ export class AlbumsController {
     const { id } = req.params;
     try {
       const album = await this.findAlbumByIdUseCase.execute({ albumId: id });
-      return res.status(200).json({
-        status: 'success',
+      const response: ApiResponse<typeof album> = {
+        success: true,
         message: 'Album retrieved successfully',
         data: album,
-        errors: null
-      });
+        errors: null,
+      };
+      return res.status(200).json(response);
     } catch (error) {
       return next(error);
     }
@@ -61,12 +64,13 @@ export class AlbumsController {
 
     try {
       const result = await this.updateAlbumUseCase.execute(data, id);
-      return res.status(200).json({
-        status: 'success',
+      const response: ApiResponse<typeof result.album> = {
+        success: true,
         message: 'Album updated successfully',
         data: result.album,
-        errors: null
-      });
+        errors: null,
+      };
+      return res.status(200).json(response);
     } catch (error) {
       return next(error);
     }
@@ -76,12 +80,13 @@ export class AlbumsController {
     const { userId } = req.params;
     try {
       const albums = await this.findAlbumsByUserIdUseCase.execute({ userId });
-      return res.status(200).json({
-        status: 'success',
+      const response: ApiResponse<typeof albums> = {
+        success: true,
         message: 'Albums retrieved successfully',
         data: albums,
-        errors: null
-      });
+        errors: null,
+      };
+      return res.status(200).json(response);
     } catch (error) {
       return next(error);
     }
@@ -92,12 +97,13 @@ export class AlbumsController {
 
     try {
       const result = await this.deleteAlbumUseCase.execute(id, req.user.id);
-      return res.status(200).json({
-        status: 'success',
+      const response: ApiResponse<typeof result> = {
+        success: true,
         message: 'Album deleted successfully',
         data: result,
-        errors: null
-      });
+        errors: null,
+      };
+      return res.status(200).json(response);
     } catch (error) {
       return next(error);
     }
