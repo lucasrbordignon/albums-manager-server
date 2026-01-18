@@ -13,8 +13,10 @@ authRoutes.post('/reset-password', controller.resetPassword);
 
 authRoutes.get('/me', ensureAuthenticated, async (req, res) => {
   return res.json({
+    success: true,
     message: 'You are authenticated',
-    userId: req.user.id,
+    data: { userId: req.user.id },
+    errors: null,
   });
 });
 

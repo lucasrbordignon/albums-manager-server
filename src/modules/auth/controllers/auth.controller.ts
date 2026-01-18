@@ -20,7 +20,7 @@ export class AuthController {
     const resultRegisterBodySchema = registerBodySchema.safeParse(req.body);
     if (!resultRegisterBodySchema.success) {
       return res.status(400).json({
-        status: 'fail',
+        success: false,
         message: 'Erro de validação',
         data: null,
         errors: resultRegisterBodySchema.error.errors.map(error => ({
@@ -35,7 +35,7 @@ export class AuthController {
     try {
       const result = await registerUseCase.execute({ name, email, password });
       return res.status(201).json({
-        status: 'success',
+        success: true,
         message: 'Usuário registrado com sucesso',
         data: result,
         errors: null,
@@ -53,7 +53,7 @@ export class AuthController {
     const resultLoginBodySchema = loginBodySchema.safeParse(req.body);
     if (!resultLoginBodySchema.success) {
       return res.status(400).json({
-        status: 'fail',
+        success: false,
         message: 'Erro de validação',
         data: null,
         errors: resultLoginBodySchema.error.errors.map(error => ({
@@ -68,7 +68,7 @@ export class AuthController {
     try {
       const result = await loginUseCase.execute({ email, password });
       return res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Login realizado com sucesso',
         data: result,
         errors: null,
@@ -83,7 +83,7 @@ export class AuthController {
     const resultSchema = schema.safeParse(req.body);
     if (!resultSchema.success) {
       return res.status(400).json({
-        status: 'fail',
+        success: false,
         message: 'Erro de validação',
         data: null,
         errors: resultSchema.error.errors.map(error => ({
@@ -98,14 +98,14 @@ export class AuthController {
     try {
       const result = await useCase.execute(refreshToken);
       return res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Token atualizado com sucesso',
         data: result,
         errors: null,
       });
     } catch (error) {
       return res.status(401).json({
-        status: 'fail',
+        success: false,
         message: 'Refresh token inválido',
         data: null,
         errors: [{ field: 'refreshToken', message: 'Token inválido ou expirado' }],
@@ -120,7 +120,7 @@ export class AuthController {
     const resultRegisterBodySchema = registerBodySchema.safeParse(req.body);
     if (!resultRegisterBodySchema.success) {
       return res.status(400).json({
-        status: 'fail',
+        success: false,
         message: 'Erro de validação',
         data: null,
         errors: resultRegisterBodySchema.error.errors.map(error => ({
@@ -137,14 +137,14 @@ export class AuthController {
     try {
       const { expiresAt } = await forgotPasswordUseCase.execute({ email });
       return res.status(201).json({
-        status: 'success',
+        success: true,
         message: 'Token de recuperação enviado com sucesso',
         data: { expiresAt },
         errors: null,
       });
     } catch (error) {
       return res.status(500).json({
-        status: 'fail',
+        success: false,
         message: 'Erro ao enviar token de recuperação',
         data: null,
         errors: [{ field: 'email', message: 'Erro interno ao enviar e-mail' }],
@@ -161,7 +161,7 @@ export class AuthController {
     const result = schema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({
-        status: 'fail',
+        success: false,
         message: 'Erro de validação',
         data: null,
         errors: result.error.errors.map(error => ({
@@ -177,14 +177,14 @@ export class AuthController {
     try {
       await useCase.execute({ email, otp, newPassword: password });
       return res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Senha atualizada com sucesso',
         data: null,
         errors: null,
       });
     } catch (error: any) {
       return res.status(error?.statusCode || 400).json({
-        status: 'fail',
+        success: false,
         message: error?.message || 'Erro ao atualizar senha',
         data: null,
         errors: [{ field: 'otp', message: error?.message || 'Token inválido ou expirado' }],
