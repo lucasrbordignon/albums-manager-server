@@ -7,7 +7,6 @@ const photosRoutes = Router();
 const controller = new PhotoController();
 photosRoutes.use(ensureAuthenticated);
 photosRoutes.post('/', controller.createPhoto.bind(controller));
-photosRoutes.get('/:albumId', controller.listPhotosByAlbum.bind(controller));
 photosRoutes.delete('/:id', controller.deletePhoto.bind(controller));
 
 export { photosRoutes };

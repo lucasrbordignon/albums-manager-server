@@ -5,7 +5,7 @@ import { PaginatedResponse } from '@/shared/interfaces/IPaginatedResponse'
 import { PaginationParams } from '@/shared/interfaces/IPaginationParams'
 import { Photo } from '@/generated/prisma/client'
 
-export class PrismaPhotosRepository implements IPhotosRepository {
+export class PhotosRepository implements IPhotosRepository {
   async create(data: CreatePhotoDTO): Promise<Photo> {
     return prisma.photo.create({
       data
