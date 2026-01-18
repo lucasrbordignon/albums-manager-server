@@ -90,10 +90,8 @@ export class AlbumsController {
   async deleteAlbum(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
 
-    const userId = 'c556f75c-048c-444f-86ab-61eba486a471'; // This should come from authenticated user context
-
     try {
-      const result = await this.deleteAlbumUseCase.execute(id, userId);
+      const result = await this.deleteAlbumUseCase.execute(id, req.user.id);
       return res.status(200).json({
         status: 'success',
         message: 'Album deleted successfully',

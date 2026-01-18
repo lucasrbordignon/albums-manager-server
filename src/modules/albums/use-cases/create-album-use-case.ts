@@ -1,7 +1,6 @@
 import { IAlbumsRepository } from '@/shared/interfaces/IAlbumsRepository';
-import { CreateAlbumDTO } from '../dtos/CreateAlbumDTO';
 import { AppError } from '@/shared/errors/AppError';
-
+import { CreateAlbumDTO } from '../dtos/CreateAlbumDTO';
 
 export class CreateAlbumUseCase {
   constructor(private albumsRepository: IAlbumsRepository) {}
