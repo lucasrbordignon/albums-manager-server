@@ -1,6 +1,6 @@
-import { AppError } from '../../../shared/errors/AppError';
-import { IUserRepository } from '../../../shared/interfaces/IUserRepository';
-import { hashPassword } from '../../../shared/utils/hash';
+import { AppError } from '@/shared/errors/AppError';
+import { IUserRepository } from '@/shared/interfaces/IUserRepository';
+import { hashPassword } from '@/shared/utils/hash';
 
 interface RegisterUseCaseRequest {
   name: string;

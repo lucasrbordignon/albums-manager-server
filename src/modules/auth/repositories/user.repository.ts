@@ -1,5 +1,5 @@
-import { prisma } from "../../../lib/prisma";
-import { IUserRepository } from '../../../shared/interfaces/IUserRepository';
+import { prisma } from "@/lib/prisma";
+import { IUserRepository } from '@/shared/interfaces/IUserRepository';
 
 export class UserRepository implements IUserRepository {
   async findByEmail(email: string) {

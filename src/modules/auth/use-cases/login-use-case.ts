@@ -1,8 +1,8 @@
-import { AppError } from '../../../shared/errors/AppError';
-import { IUserRepository } from '../../../shared/interfaces/IUserRepository';
-import { generateRefreshToken } from '../../../shared/utils/generateRefreshToken';
-import { comparePassword } from '../../../shared/utils/hash';
-import { generateToken } from '../../../shared/utils/jwt';
+import { AppError } from '@/shared/errors/AppError';
+import { IUserRepository } from '@/shared/interfaces/IUserRepository';
+import { generateRefreshToken } from '@/shared/utils/generateRefreshToken';
+import { comparePassword } from '@/shared/utils/hash';
+import { generateToken } from '@/shared/utils/jwt';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 
 interface LoginRequest {

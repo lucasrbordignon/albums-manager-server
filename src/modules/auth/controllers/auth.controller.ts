@@ -7,8 +7,8 @@ import { RefreshTokenUseCase } from '../use-cases/refresh-token-use-case';
 import { RegisterUseCase } from '../use-cases/register-use-case';
 import { ResetPasswordUseCase } from '../use-cases/reset-password-use-case';
 import { ForgotPasswordUseCase } from '../use-cases/forgot-password-use-case';
-import { NodemailerEmailService } from '../../../infra/email/NodemailerEmailService';
-import { RedisPasswordResetTokenRepository } from '../../../infra/redis/RedisPasswordResetTokenRepository';
+import { NodemailerEmailService } from '@/infra/email/NodemailerEmailService';
+import { RedisPasswordResetTokenRepository } from '@/infra/redis/RedisPasswordResetTokenRepository';
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
