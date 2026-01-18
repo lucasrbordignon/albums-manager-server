@@ -13,12 +13,23 @@ export class UpdateAlbumUseCase {
       throw new AppError('Album not found', 404);
     }
 
-    const album = await this.albumsRepository.update(albumId, data);
+    const albumWithSameTitle = await this.albumsRepository.findByTitleAndUserId(
+      data.title || albumExists.title,
+      albumExists.userId
+    );
 
-    if (!album) {
-      throw new AppError('Failed to update album', 500);
+    if (albumWithSameTitle && albumWithSameTitle.id !== albumId) {
+      throw new AppError('Another album with this title already exists for the user', 409);
     }
 
-    return { album };
+    try {
+      const album = await this.albumsRepository.update(albumId, data);
+      return { album };
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed to update album', 500);
+    }
   }
 }

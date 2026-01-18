@@ -38,7 +38,7 @@ model Albums {
   deletedAt   DateTime?
 
   userId String
-  User    User   @relation(fields: [userId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
 
-  @@index([userId], name: "idx_user_id")
+  @@index([userId])
 }

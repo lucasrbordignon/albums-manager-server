@@ -29,7 +29,7 @@ services:
 
   api:
     build: .
-    container_name: albuns-api
+    container_name: albums-api
     restart: unless-stopped
     command: npm run dev
     volumes:

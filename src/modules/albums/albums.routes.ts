@@ -4,9 +4,9 @@ import { AlbumsController } from './controllers/albums.controller';
 const albumsRoutes = Router();
 const controller = new AlbumsController();
 
-albumsRoutes.post('/', controller.createAlbum);
-albumsRoutes.get('/:id', controller.findAlbumById);
-albumsRoutes.put('/:id', controller.updateAlbum);
-albumsRoutes.delete('/:id', controller.deleteAlbum);
+albumsRoutes.post('/', controller.createAlbum.bind(controller));
+albumsRoutes.get('/:id', controller.findAlbumById.bind(controller));
+albumsRoutes.put('/:id', controller.updateAlbum.bind(controller));
+albumsRoutes.delete('/:id', controller.deleteAlbum.bind(controller));
 
 export { albumsRoutes };
