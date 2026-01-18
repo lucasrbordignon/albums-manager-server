@@ -45,9 +45,10 @@ export const storage = multer.diskStorage({
 export const upload = multer({
   storage,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
+    fileSize: 10 * 1024 * 1024, 
   },
   fileFilter(_, file, cb) {
+    console.log('Entrou no uploadPhoto');
     if (!allowedMimeTypes.includes(file.mimetype)) {
       return cb(
         new AppError('Invalid file type. Only images allowed', 400)

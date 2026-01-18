@@ -8,10 +8,10 @@ import { upload } from '@/infra/multer/upload';
 
 const photosRoutes = Router();
 const controller = new PhotoController();
+
 photosRoutes.use(ensureAuthenticated);
-photosRoutes.post('/', controller.createPhoto.bind(controller));
 photosRoutes.delete('/:id', controller.deletePhoto.bind(controller));
-photosRoutes.post('/upload', upload.single('photo'), controller.uploadPhoto.bind(controller));
+photosRoutes.post('/upload', upload.single('file'), controller.uploadPhoto.bind(controller));
 
 photosRoutes.get(
   '/images/:filename',

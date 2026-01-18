@@ -33,6 +33,7 @@ export function ensureAuthenticated(
       id: decoded.sub,
     };
 
+    console.log('Authenticated user:', req.user);
     return next();
   } catch (err) {
     throw new AppError('Invalid or expired token', 401);
