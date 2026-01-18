@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { AlbumsController } from './controllers/albums.controller';
 import { ensureAuthenticated } from '../auth/middlewares/auth.middleware';

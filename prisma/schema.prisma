@@ -15,7 +15,9 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
-  albums        Albums[]
+  albums        Album[]
+
+  @@map("users")
 }
 
 model RefreshToken {
@@ -25,20 +27,50 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
 }
 
-model Albums {
-  id          String   @id @default(uuid())
+model Album {
+  id          String @id @default(uuid())
   title       String
   description String
-  photoCount  Int      @default(0)
+  photoCount  Int    @default(0)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   userId String
-  user    User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  photos    Photo[]
 
   @@index([userId])
+  @@map("albums")
+}
+
+model Photo {
+  id              String   @id @default(uuid())
+
+  title           String
+  description     String?
+  acquiredAt      DateTime
+
+  sizeInBytes     Int
+  mimeType        String
+  filePath        String   @map("file_path")
+
+  dominantColor   String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  albumId         String?
+  album           Album?   @relation(fields: [albumId], references: [id])
+
+  @@map("photos")
+
+  @@index([albumId, deletedAt, acquiredAt])
 }
