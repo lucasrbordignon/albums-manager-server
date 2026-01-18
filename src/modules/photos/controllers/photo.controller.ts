@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import { PhotosRepository } from '../repositories/photo.repository'
-import { CreatePhotoUseCase } from '../use-cases/create-photo-use-case'
 import { DeletePhotoUseCase } from '../use-cases/delete-album-use-case'
 import type { ApiResponse } from '@/shared/errors/errorHandler'
-import { AlbumsRepository } from '@/modules/albums/repositories/albums.repository'
 import fs from 'fs/promises'
-import path from 'path'
 import { AppError } from '@/shared/errors/AppError'
 import { imageQueue } from '@/queues/image.queue'
 
@@ -45,13 +42,23 @@ export class PhotoController {
         throw new AppError('Invalid file type', 400)
       }
 
-      await imageQueue.add('process-photo', {
+      console.log('[QUEUE] enqueue image-processing', {
+        userId: req.user.id,
+        file: req.file?.path,
+      });
+
+      const job = await imageQueue.add('process-photo', {
         tempPath: req.file.path,
         originalName: req.file.originalname,
         userId: req.user.id,
         albumId: req.body.albumId,
         acquiredAt: req.body.acquiredAt
       })
+
+      console.log('[QUEUE] job criado', {
+        id: job.id,
+        name: job.name,
+      });
 
       return res.status(202).json({
         success: true,

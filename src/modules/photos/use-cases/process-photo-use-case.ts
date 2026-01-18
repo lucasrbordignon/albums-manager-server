@@ -1,7 +1,5 @@
 import sharp from 'sharp';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Vibrant from 'node-vibrant/lib/bundle';
+import { Vibrant } from 'node-vibrant/node';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
@@ -83,7 +81,7 @@ export class ProcessPhotoUseCase {
       mimeType: 'image/webp',
       filePath: imagePath,
       thumbnailPath: thumbPath,
-      dominantColor,
+      dominantColor: dominantColor ?? undefined,
       hash,
     };
 

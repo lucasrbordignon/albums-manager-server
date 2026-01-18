@@ -47,6 +47,23 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      
+  worker:
+    build: .
+    container_name: albums-worker
+    restart: unless-stopped
+    command: npm run worker
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    environment:
+      - UPLOAD_DIR=/app/uploads
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_started
 
 volumes:
   postgres_data:
