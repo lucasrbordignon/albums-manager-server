@@ -10,6 +10,7 @@ import { updateAlbumSchema } from '../schemas/updateAlbum.schema'
 import { DeleteAlbumUseCase } from '../use-cases/delete-album-use-case'
 import { ListPhotosByAlbumUseCase } from '@/modules/photos/use-cases/list-photos-by-album-use-case'
 import { PhotosRepository } from '@/modules/photos/repositories/photo.repository'
+import { photoPresenter } from '../utils/photoPresenter'
 
 export class AlbumsController {
   private albumsRepository: AlbumsRepository;
@@ -142,10 +143,14 @@ export class AlbumsController {
     const limit = Number(req.query.limit) || 10;
     try {
       const result = await this.listPhotosByAlbumUseCase.execute({ albumId: id, page, limit });
-      const response: ApiResponse<typeof result> = {
+      const presented = {
+        ...result,
+        data: result.data.map(photoPresenter)
+      };
+      const response: ApiResponse<typeof presented> = {
         success: true,
         message: 'Photos retrieved successfully',
-        data: result,
+        data: presented,
         errors: null,
       };
       return res.status(200).json(response);
