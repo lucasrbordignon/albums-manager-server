@@ -1,6 +1,6 @@
+import { Album } from "@/generated/prisma/client";
 import { CreateAlbumDTO } from "@/modules/albums/dtos/CreateAlbumDTO";
 import { UpdateAlbumDTO } from "@/modules/albums/dtos/UpdateAlbumDTO";
-import { Album } from "@/modules/albums/entities/Album";
 
 export interface IAlbumsRepository {
   create(data: CreateAlbumDTO): Promise<Album>;

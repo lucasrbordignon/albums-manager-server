@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createAlbumSchema = z.object({
-  title: z.string().min(3),
-  description: z.string().min(10),
+  title: z.string(),
+  description: z.string(),
   userId: z.string().uuid(),
 });

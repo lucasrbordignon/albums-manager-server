@@ -1,23 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { IAlbumsRepository } from "@/shared/interfaces/IAlbumsRepository";
 import { CreateAlbumDTO } from "../dtos/CreateAlbumDTO";
-import { Album } from "../entities/Album";
 import { UpdateAlbumDTO } from "../dtos/UpdateAlbumDTO";
+import { Album } from "@/generated/prisma/client";
 
 export class AlbumsRepository implements IAlbumsRepository {
   async create(data: CreateAlbumDTO): Promise<Album> {
-    return await prisma.albums.create({data});
+    return await prisma.album.create({data});
   }
 
   async update(id: string, data: Partial<UpdateAlbumDTO>): Promise<Album> {
-    return prisma.albums.update({
+    return prisma.album.update({
       where: { id },
       data,
     });
   }
 
   async findById(id: string): Promise<Album | null> {
-    return prisma.albums.findFirst({
+    return prisma.album.findFirst({
       where: {
         id,
         deletedAt: null,
@@ -26,7 +26,7 @@ export class AlbumsRepository implements IAlbumsRepository {
   }
 
   async findByUserId(userId: string): Promise<Album[]> {
-    return prisma.albums.findMany({
+    return prisma.album.findMany({
       where: {
         userId: userId,
         deletedAt: null,
@@ -35,14 +35,14 @@ export class AlbumsRepository implements IAlbumsRepository {
   }
 
   async softDelete(id: string): Promise<void> {
-    await prisma.albums.update({
+    await prisma.album.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
   }
 
   async findByTitleAndUserId(title: string, userId: string): Promise<Album | null> {
-    return prisma.albums.findFirst({
+    return prisma.album.findFirst({
       where: {
         title,
         userId,

@@ -8,26 +8,44 @@ import type { ApiResponse } from '@/shared/errors/errorHandler';
 import { FindAlbumsByUserIdUseCase } from '../use-cases/find-albums-by-user-use-case'
 import { updateAlbumSchema } from '../schemas/updateAlbum.schema'
 import { DeleteAlbumUseCase } from '../use-cases/delete-album-use-case'
+import { ListPhotosByAlbumUseCase } from '@/modules/photos/use-cases/list-photos-by-album-use-case'
+import { PhotosRepository } from '@/modules/photos/repositories/photo.repository'
+import { photoPresenter } from '../utils/photoPresenter'
 
 export class AlbumsController {
   private albumsRepository: AlbumsRepository;
+  private photosRepository: PhotosRepository;
   private createAlbumUseCase: CreateAlbumUseCase;
   private findAlbumByIdUseCase: FindAlbumByIdUseCase;
   private updateAlbumUseCase: UpdateAlbumUseCase;
   private findAlbumsByUserIdUseCase: FindAlbumsByUserIdUseCase;
   private deleteAlbumUseCase: DeleteAlbumUseCase;
+  private listPhotosByAlbumUseCase: ListPhotosByAlbumUseCase;
 
   constructor() {
     this.albumsRepository = new AlbumsRepository();
+    this.photosRepository = new PhotosRepository();
     this.createAlbumUseCase = new CreateAlbumUseCase(this.albumsRepository);
     this.findAlbumByIdUseCase = new FindAlbumByIdUseCase(this.albumsRepository);
     this.updateAlbumUseCase = new UpdateAlbumUseCase(this.albumsRepository);
     this.findAlbumsByUserIdUseCase = new FindAlbumsByUserIdUseCase(this.albumsRepository);
     this.deleteAlbumUseCase = new DeleteAlbumUseCase(this.albumsRepository);
+    this.listPhotosByAlbumUseCase = new ListPhotosByAlbumUseCase(this.photosRepository, this.albumsRepository);
+    
   }
 
   async createAlbum(req: Request, res: Response, next: NextFunction) {
-    const data = createAlbumSchema.parse(req.body);
+    let data;
+    try {
+      data = createAlbumSchema.parse(req.body);
+    } catch (error: any) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        data: null,
+        errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
+      });
+    }
     try {
       const album = await this.createAlbumUseCase.execute(data);
       const response: ApiResponse<typeof album> = {
@@ -60,7 +78,17 @@ export class AlbumsController {
 
   async updateAlbum(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
-    const data = updateAlbumSchema.parse(req.body);
+    let data;
+    try {
+      data = updateAlbumSchema.parse(req.body);
+    } catch (error: any) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        data: null,
+        errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
+      });
+    }
 
     try {
       const result = await this.updateAlbumUseCase.execute(data, id);
@@ -101,6 +129,28 @@ export class AlbumsController {
         success: true,
         message: 'Album deleted successfully',
         data: result,
+        errors: null,
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async listPhotosByAlbum(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    try {
+      const result = await this.listPhotosByAlbumUseCase.execute({ albumId: id, page, limit });
+      const presented = {
+        ...result,
+        data: result.data.map(photoPresenter)
+      };
+      const response: ApiResponse<typeof presented> = {
+        success: true,
+        message: 'Photos retrieved successfully',
+        data: presented,
         errors: null,
       };
       return res.status(200).json(response);

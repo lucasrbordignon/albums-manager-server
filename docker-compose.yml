@@ -35,6 +35,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./uploads:/app/uploads
+    environment:
+      - UPLOAD_DIR=/app/uploads
     ports:
       - "3333:3333"
     env_file:
@@ -42,6 +45,23 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
+      
+  worker:
+    build: .
+    container_name: albums-worker
+    restart: unless-stopped
+    command: npm run worker
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    environment:
+      - UPLOAD_DIR=/app/uploads
+    env_file:
+      - .env
+    depends_on:
       redis:
         condition: service_started
 
