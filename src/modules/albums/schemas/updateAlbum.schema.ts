@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const updateAlbumSchema = z
   .object({
-    title: z.string().min(3),
-    description: z.string().min(10),
+    title: z.string(),
+    description: z.string().optional(),
   })
   .partial()
   .refine(

@@ -27,7 +27,17 @@ export class AlbumsController {
   }
 
   async createAlbum(req: Request, res: Response, next: NextFunction) {
-    const data = createAlbumSchema.parse(req.body);
+    let data;
+    try {
+      data = createAlbumSchema.parse(req.body);
+    } catch (error: any) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        data: null,
+        errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
+      });
+    }
     try {
       const album = await this.createAlbumUseCase.execute(data);
       const response: ApiResponse<typeof album> = {
@@ -60,7 +70,17 @@ export class AlbumsController {
 
   async updateAlbum(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
-    const data = updateAlbumSchema.parse(req.body);
+    let data;
+    try {
+      data = updateAlbumSchema.parse(req.body);
+    } catch (error: any) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        data: null,
+        errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
+      });
+    }
 
     try {
       const result = await this.updateAlbumUseCase.execute(data, id);
