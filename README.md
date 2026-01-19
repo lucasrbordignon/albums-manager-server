@@ -59,11 +59,11 @@ config/
 
 ---
 
-## 📸 Arquitetura de Upload de Imagens
+## Arquitetura de Upload de Imagens
 
 O fluxo de upload de imagens foi projetado para ser **assíncrono, escalável e seguro**, separando claramente responsabilidades entre API, fila e worker.
 
-### 🔄 Fluxo completo
+### Fluxo completo
 
 1. **Frontend**
    - Envia a imagem via `multipart/form-data` para `POST /photos/upload`
@@ -100,13 +100,13 @@ O fluxo de upload de imagens foi projetado para ser **assíncrono, escalável e 
    - As imagens são consumidas diretamente pelo navegador (`<img src="...">`)
    - Cache e CDN-friendly
 
-### ✅ Benefícios
+### Benefícios
 
-- 🚀 Upload não bloqueante
-- ♻️ Deduplicação por hash
-- 📉 Menor uso de CPU na API
-- 🔐 Segurança via API, não via arquivos
-- 📦 Pronto para CDN / S3 / R2
+- Upload não bloqueante
+- Deduplicação por hash
+- Menor uso de CPU na API
+- Segurança via API, não via arquivos
+- Pronto para CDN / S3 / R2
 
 
 ## Estrutura de Pastas
