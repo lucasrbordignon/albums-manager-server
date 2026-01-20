@@ -38,7 +38,7 @@ services:
     container_name: albums-api
     restart: unless-stopped
     env_file:
-      - .env.production
+      - .env
     ports:
       - "127.0.0.1:3333:3333"
     depends_on:
