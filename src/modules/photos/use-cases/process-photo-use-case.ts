@@ -22,7 +22,6 @@ type Input = {
 export class ProcessPhotoUseCase {
   constructor(
     private createPhotoUseCase: CreatePhotoUseCase,
-    private photosRepository = new PhotosRepository()
   ) {}
 
   async execute(input: Input) {
@@ -32,13 +31,6 @@ export class ProcessPhotoUseCase {
       .createHash('sha256')
       .update(buffer)
       .digest('hex');
-
-    const existing = await this.photosRepository.findByHash(hash);
-
-    if (existing) {
-      await fs.unlink(input.tempPath);
-      return existing;
-    }
 
     const userDir = path.join(
       uploadRoot,
@@ -82,7 +74,6 @@ export class ProcessPhotoUseCase {
       filePath: imagePath,
       thumbnailPath: thumbPath,
       dominantColor: dominantColor ?? undefined,
-      hash,
     };
 
     const photo = await this.createPhotoUseCase.execute(data);

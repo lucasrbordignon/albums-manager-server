@@ -7,6 +7,5 @@ export interface IPhotosRepository {
   create(data: CreatePhotoDTO): Promise<Photo>
   softDelete(photoId: string): Promise<void>
   findById(photoId: string): Promise<Photo | null>
-  findByHash(hash: string): Promise<Photo | null>
   findManyByAlbum(albumId: string, params: PaginationParams): Promise<PaginatedResponse<Photo>>
 }

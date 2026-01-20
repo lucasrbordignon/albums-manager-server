@@ -36,15 +36,6 @@ export class PhotosRepository implements IPhotosRepository {
     })
   }
 
-  async findByHash(hash: string): Promise<Photo | null> {
-    return prisma.photo.findFirst({
-      where: {
-        hash,
-        deletedAt: null
-      }
-    })
-  }
-
   async findManyByAlbum(
     albumId: string,
     { page, limit }: PaginationParams

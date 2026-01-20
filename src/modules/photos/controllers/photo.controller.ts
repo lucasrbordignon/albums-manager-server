@@ -48,7 +48,7 @@ export class PhotoController {
       const albumsRepo = new AlbumsRepository();
       const photosRepo = new PhotosRepository();
       const createPhotoUseCase = new CreatePhotoUseCase(photosRepo, albumsRepo);
-      const processPhotoUseCase = new ProcessPhotoUseCase(createPhotoUseCase, photosRepo);
+      const processPhotoUseCase = new ProcessPhotoUseCase(createPhotoUseCase);
 
       const photo = await processPhotoUseCase.execute({
         tempPath: req.file.path,

@@ -61,7 +61,6 @@ model Photo {
   mimeType        String
   filePath        String   @map("file_path")
   thumbnailPath   String?  @map("thumbnail_path")
-  hash            String?  
 
   dominantColor   String?
 
@@ -75,5 +74,4 @@ model Photo {
   @@map("photos")
 
   @@index([albumId, deletedAt, acquiredAt])
-  @@unique([id, hash, deletedAt])
 }
