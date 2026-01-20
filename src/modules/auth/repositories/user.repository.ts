@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { IUserRepository } from '@/shared/interfaces/IUserRepository';
 
 export class UserRepository implements IUserRepository {

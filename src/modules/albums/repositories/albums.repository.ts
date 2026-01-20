@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { IAlbumsRepository } from "@/shared/interfaces/IAlbumsRepository";
 import { CreateAlbumDTO } from "../dtos/CreateAlbumDTO";
 import { UpdateAlbumDTO } from "../dtos/UpdateAlbumDTO";

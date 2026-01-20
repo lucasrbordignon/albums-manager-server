@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Copia apenas o necessário primeiro (cache eficiente)
 COPY package*.json ./
+COPY tsconfig.json ./
 COPY prisma ./prisma
 
 RUN npm ci

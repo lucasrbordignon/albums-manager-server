@@ -1,5 +1,5 @@
 import { CreatePhotoDTO } from '@/modules/photos/dtos/CreatePhotoDTO'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '../../../lib/prisma'
 import { IPhotosRepository } from '@/shared/interfaces/IPhotosRepository'
 import { PaginatedResponse } from '@/shared/interfaces/IPaginatedResponse'
 import { PaginationParams } from '@/shared/interfaces/IPaginationParams'
