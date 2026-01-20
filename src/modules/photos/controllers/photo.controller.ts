@@ -24,7 +24,7 @@ export class PhotoController {
       await this.deletePhotoUseCase.execute(id)
       const response: ApiResponse<null> = {
         success: true,
-        message: 'Photo deleted successfully',
+        message: 'Foto deletada com sucesso',
         data: null,
         errors: null
       }
@@ -42,7 +42,7 @@ export class PhotoController {
       }
 
       if (!req.file.mimetype.startsWith('image/')) {
-        throw new AppError('Invalid file type', 400)
+        throw new AppError('Tipo de arquivo inválido', 400)
       }
 
       const albumsRepo = new AlbumsRepository();
@@ -60,7 +60,7 @@ export class PhotoController {
 
       return res.status(201).json({
         success: true,
-        message: 'Photo uploaded and processed successfully',
+        message: 'Foto enviada e processada com sucesso',
         data: photoPresenter(photo),
         errors: null
       });

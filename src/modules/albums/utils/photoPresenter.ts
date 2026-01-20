@@ -1,8 +1,7 @@
 import type { Photo } from '@/generated/prisma/client';
-import { serialize } from 'v8';
 
 export function photoPresenter(photo: Photo) {
-  const baseUrl = process.env.API_URL ?? 'http://localhost:3333';
+  const baseUrl = process.env.API_URL;
   return {
     id: photo.id,
     title: photo.title,

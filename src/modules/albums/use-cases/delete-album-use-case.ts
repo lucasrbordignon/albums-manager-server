@@ -1,20 +1,26 @@
 import { IAlbumsRepository } from '@/shared/interfaces/IAlbumsRepository';
 import { AppError } from '@/shared/errors/AppError';
+import { IPhotosRepository } from '@/shared/interfaces/IPhotosRepository';
 
 export class DeleteAlbumUseCase {
-  constructor(private albumsRepository: IAlbumsRepository) {}
+  constructor(private albumsRepository: IAlbumsRepository, private photosRepository: IPhotosRepository) {}
 
   async execute(albumId: string, userId: string) {
     const albumExists = await this.albumsRepository.findById(albumId);
     if (!albumExists) {
-      throw new AppError('Album not found', 404);
+      throw new AppError('Álbum não encontrado', 404);
     }
     if (albumExists.userId !== userId) {
-      throw new AppError('You are not allowed to delete this album', 403);
+      throw new AppError('Você não tem permissão para deletar este álbum', 403);
     }
-    
+
+    const existPhotos = await this.photosRepository.findManyByAlbum(albumId, { page: 1, limit: 1 });
+    if (existPhotos.data.length > 0) {
+      throw new AppError('Não é possível deletar um álbum com fotos. Por favor, remova todas as fotos primeiro.', 400);
+    }
+
     await this.albumsRepository.softDelete(albumId);
 
-    return { message: 'Album deleted successfully' };
+    return { message: 'Álbum deletado com sucesso' };
   }
 }

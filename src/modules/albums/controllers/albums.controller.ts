@@ -29,7 +29,7 @@ export class AlbumsController {
     this.findAlbumByIdUseCase = new FindAlbumByIdUseCase(this.albumsRepository);
     this.updateAlbumUseCase = new UpdateAlbumUseCase(this.albumsRepository);
     this.findAlbumsByUserIdUseCase = new FindAlbumsByUserIdUseCase(this.albumsRepository);
-    this.deleteAlbumUseCase = new DeleteAlbumUseCase(this.albumsRepository);
+    this.deleteAlbumUseCase = new DeleteAlbumUseCase(this.albumsRepository, this.photosRepository);
     this.listPhotosByAlbumUseCase = new ListPhotosByAlbumUseCase(this.photosRepository, this.albumsRepository);
     
   }
@@ -41,7 +41,7 @@ export class AlbumsController {
     } catch (error: any) {
       return res.status(400).json({
         success: false,
-        message: 'Validation error',
+        message: 'Erro de validação',
         data: null,
         errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
       });
@@ -50,7 +50,7 @@ export class AlbumsController {
       const album = await this.createAlbumUseCase.execute(data);
       const response: ApiResponse<typeof album> = {
         success: true,
-        message: 'Album created successfully',
+        message: 'Álbum criado com sucesso',
         data: album,
         errors: null,
       };
@@ -66,7 +66,7 @@ export class AlbumsController {
       const album = await this.findAlbumByIdUseCase.execute({ albumId: id });
       const response: ApiResponse<typeof album> = {
         success: true,
-        message: 'Album retrieved successfully',
+        message: 'Álbum recuperado com sucesso',
         data: album,
         errors: null,
       };
@@ -84,7 +84,7 @@ export class AlbumsController {
     } catch (error: any) {
       return res.status(400).json({
         success: false,
-        message: 'Validation error',
+        message: 'Erro de validação',
         data: null,
         errors: error.errors?.map((e: any) => ({ field: e.path?.[0], message: e.message })) ?? error.message,
       });
@@ -94,7 +94,7 @@ export class AlbumsController {
       const result = await this.updateAlbumUseCase.execute(data, id);
       const response: ApiResponse<typeof result.album> = {
         success: true,
-        message: 'Album updated successfully',
+        message: 'Álbum atualizado com sucesso',
         data: result.album,
         errors: null,
       };
@@ -110,7 +110,7 @@ export class AlbumsController {
       const albums = await this.findAlbumsByUserIdUseCase.execute({ userId });
       const response: ApiResponse<typeof albums> = {
         success: true,
-        message: 'Albums retrieved successfully',
+        message: 'Álbuns recuperados com sucesso',
         data: albums,
         errors: null,
       };
@@ -127,7 +127,7 @@ export class AlbumsController {
       const result = await this.deleteAlbumUseCase.execute(id, req.user.id);
       const response: ApiResponse<typeof result> = {
         success: true,
-        message: 'Album deleted successfully',
+        message: 'Álbum deletado com sucesso',
         data: result,
         errors: null,
       };
@@ -149,7 +149,7 @@ export class AlbumsController {
       };
       const response: ApiResponse<typeof presented> = {
         success: true,
-        message: 'Photos retrieved successfully',
+        message: 'Fotos recuperadas com sucesso',
         data: presented,
         errors: null,
       };
