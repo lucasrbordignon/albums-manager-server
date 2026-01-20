@@ -59,56 +59,6 @@ config/
 
 ---
 
-## Arquitetura de Upload de Imagens
-
-O fluxo de upload de imagens foi projetado para ser **assíncrono, escalável e seguro**, separando claramente responsabilidades entre API, fila e worker.
-
-### Fluxo completo
-
-1. **Frontend**
-   - Envia a imagem via `multipart/form-data` para `POST /photos/upload`
-   - A requisição é autenticada via JWT
-   - A API responde imediatamente com **202 Accepted**
-
-2. **API (Express)**
-   - Recebe o arquivo temporário via **Multer**
-   - Valida tipo MIME e autenticação
-   - Enfileira o processamento no **BullMQ (Redis)**
-   - Não processa imagens no request (request não bloqueante)
-
-3. **Fila (BullMQ + Redis)**
-   - Job `image-processing` armazena apenas metadados e o caminho temporário
-   - Garante retry, isolamento e tolerância a falhas
-
-4. **Worker**
-   - Consome a fila de processamento
-   - Executa:
-     - Conversão para `webp` (Sharp)
-     - Geração de thumbnail
-     - Extração da cor dominante (node-vibrant)
-     - Geração de hash SHA-256 (deduplicação)
-   - Salva apenas uma cópia física do arquivo
-   - Persiste metadados no banco de dados
-
-5. **Armazenamento**
-   - Arquivos ficam em `/uploads` (volume Docker)
-   - Servidos via `express.static`
-   - Paths físicos nunca são expostos diretamente ao frontend
-
-6. **Entrega no Frontend**
-   - A API retorna URLs públicas (`imageUrl`, `thumbnailUrl`)
-   - As imagens são consumidas diretamente pelo navegador (`<img src="...">`)
-   - Cache e CDN-friendly
-
-### Benefícios
-
-- Upload não bloqueante
-- Deduplicação por hash
-- Menor uso de CPU na API
-- Segurança via API, não via arquivos
-- Pronto para CDN / S3 / R2
-
-
 ## Estrutura de Pastas
 
 ```
@@ -120,10 +70,7 @@ O fluxo de upload de imagens foi projetado para ser **assíncrono, escalável e 
 │   ├── infra/
 │   ├── lib/
 │   ├── modules/
-│   ├── queues/
 │   ├── shared/
-│   ├── workers/
-│   └── ws/
 ├── prisma/
 │   ├── schema.prisma
 │   └── migrations/
@@ -144,9 +91,6 @@ O fluxo de upload de imagens foi projetado para ser **assíncrono, escalável e 
 - **lib/**: Instâncias e helpers (ex: Prisma).
 - **prisma/**: Schema e migrations do banco.
 - **uploads/**: Arquivos enviados pelos usuários.
-- **queues/**: Gerenciamento de filas (ex: processamento de imagens).
-- **workers/**: Workers para tarefas assíncronas.
-- **ws/**: WebSocket e listeners Redis.
 
 ---
 
