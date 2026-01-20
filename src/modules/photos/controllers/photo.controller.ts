@@ -4,7 +4,10 @@ import { DeletePhotoUseCase } from '../use-cases/delete-album-use-case'
 import type { ApiResponse } from '@/shared/errors/errorHandler'
 import fs from 'fs/promises'
 import { AppError } from '@/shared/errors/AppError'
-import { imageQueue } from '@/queues/image.queue'
+import { ProcessPhotoUseCase } from '../use-cases/process-photo-use-case'
+import { CreatePhotoUseCase } from '../use-cases/create-photo-use-case'
+import { AlbumsRepository } from '@/modules/albums/repositories/albums.repository'
+import { photoPresenter } from '@/modules/albums/utils/photoPresenter'
 
 export class PhotoController {
   private photosRepository: PhotosRepository
@@ -42,30 +45,25 @@ export class PhotoController {
         throw new AppError('Invalid file type', 400)
       }
 
-      console.log('[QUEUE] enqueue image-processing', {
-        userId: req.user.id,
-        file: req.file?.path,
-      });
+      const albumsRepo = new AlbumsRepository();
+      const photosRepo = new PhotosRepository();
+      const createPhotoUseCase = new CreatePhotoUseCase(photosRepo, albumsRepo);
+      const processPhotoUseCase = new ProcessPhotoUseCase(createPhotoUseCase, photosRepo);
 
-      const job = await imageQueue.add('process-photo', {
+      const photo = await processPhotoUseCase.execute({
         tempPath: req.file.path,
         originalName: req.file.originalname,
         userId: req.user.id,
         albumId: req.body.albumId,
         acquiredAt: req.body.acquiredAt
-      })
-
-      console.log('[QUEUE] job criado', {
-        id: job.id,
-        name: job.name,
       });
 
-      return res.status(202).json({
+      return res.status(201).json({
         success: true,
-        message: 'Photo queued for processing',
-        data: null,
+        message: 'Photo uploaded and processed successfully',
+        data: photoPresenter(photo),
         errors: null
-      })
+      });
     } catch (error) {
       if (req.file?.path) {
         await fs.unlink(req.file.path).catch(() => {})
