@@ -10,7 +10,6 @@ export class PhotosRepository implements IPhotosRepository {
     return prisma.photo.create({
       data: {
         ...data,
-        hash: data.hash ?? '',
         description: data.description ?? null
       }
     })
