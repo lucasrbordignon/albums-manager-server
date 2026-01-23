@@ -18,6 +18,7 @@ services:
       - app-network
 
   api-blue:
+    container_name: api-blue
     image: albums-api:${TAG}
     env_file: .env
     ports:
@@ -29,6 +30,7 @@ services:
       - redis
 
   api-green:
+    container_name: api-green
     image: albums-api:${TAG}
     env_file: .env
     ports:
