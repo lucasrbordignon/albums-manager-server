@@ -10,8 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Puxa o código do repositório
       - uses: actions/checkout@v4
 
+      # 2. Deploy direto na VPS via SSH
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1
         with:
@@ -45,7 +47,7 @@ jobs:
               HEALTH_PORT=3333
             fi
 
-            echo "Deploying $NEW_COLOR, keeping $OLD_COLOR running until healthcheck passes"
+            echo "Deploying $NEW_COLOR, mantendo $OLD_COLOR rodando até o healthcheck passar"
 
             # Build da nova imagem
             docker build -t albums-api:$TAG .
@@ -53,23 +55,35 @@ jobs:
             # Sobe o novo container
             docker compose up -d api-$NEW_COLOR
 
-            # Espera o serviço subir
-            sleep 10
+            # Espera a API ficar pronta com retry de até 60 segundos
+            MAX_RETRIES=12
+            COUNT=0
+            until curl -f http://localhost:$HEALTH_PORT/health; do
+              COUNT=$((COUNT+1))
+              if [ $COUNT -ge $MAX_RETRIES ]; then
+                echo "Healthcheck falhou após esperar"
+                docker compose stop api-$NEW_COLOR || true
+                docker compose rm -f api-$NEW_COLOR || true
+                exit 1
+              fi
+              echo "Aguardando API ficar pronta... ($COUNT/$MAX_RETRIES)"
+              sleep 5
+            done
 
-            # Healthcheck
-            if curl -f http://localhost:$HEALTH_PORT/health; then
-              echo "Healthcheck passed! Switching traffic..."
+            echo "Healthcheck passou! Trocando tráfego..."
 
-              # Atualiza Nginx
-              cp /etc/nginx/conf.d/api-$NEW_COLOR.conf /etc/nginx/conf.d/api.conf
-              nginx -s reload
+            # Atualiza Nginx usando link simbólico (garante que não haja duplicatas)
+            echo "Apontando Nginx para $NEW_COLOR..."
+            sudo ln -sf /etc/nginx/templates/api-$NEW_COLOR.conf /etc/nginx/conf.d/api.conf
 
-              # Para o container antigo
-              docker compose stop api-$OLD_COLOR || true
-            else
-              echo "Healthcheck failed! Rolling back..."
-              # Para e remove o container novo
-              docker compose stop api-$NEW_COLOR || true
-              docker compose rm -f api-$NEW_COLOR || true
-              exit 1
+            # Verifica se a sintaxe está ok antes de dar reload
+            sudo nginx -t && sudo nginx -s reload
+
+            echo "Tráfego redirecionado com sucesso para $NEW_COLOR!"
+
+            # Para o container antigo (apenas se ele estiver rodando)
+            if [ -n "$OLD_COLOR" ]; then
+                echo "Limpando versão antiga ($OLD_COLOR)..."
+                docker compose stop api-$OLD_COLOR || true
+                docker compose rm -f api-$OLD_COLOR || true
             fi

@@ -24,6 +24,9 @@ services:
       - "3333:3333"
     networks:
       - app-network
+    depends_on:
+      - postgres
+      - redis
 
   api-green:
     image: albums-api:${TAG}
@@ -32,6 +35,9 @@ services:
       - "3334:3333"
     networks:
       - app-network
+    depends_on:
+      - postgres
+      - redis
 
 networks:
   app-network:
