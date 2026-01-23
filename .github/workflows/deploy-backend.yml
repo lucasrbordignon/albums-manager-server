@@ -9,34 +9,66 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Puxa o código
       - uses: actions/checkout@v4
 
-      - name: Build image
-        run: |
-          docker build -t albums-api:${{ github.sha }} .
-
-      - name: Push image
-        run: |
-          docker tag albums-api:${{ github.sha }} albums-api:latest
-
+      # 2. Deploy direto no VPS via SSH
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: deploy
-          key: ${{ secrets.VPS_KEY }}
+          host: ${{ secrets.VPS_HOST }}       # IP ou domínio do seu VPS
+          username: deploy                    # usuário do VPS
+          key: ${{ secrets.VPS_KEY }}         # chave SSH (sem senha)
+          port: 22                            # porta SSH padrão
           script: |
+            # Diretório do projeto no VPS
             cd /var/www/albums-manager-api
+
+            # Tag da imagem com commit SHA
             export TAG=${{ github.sha }}
 
-            docker compose pull
-            docker compose up -d api-green
+            # Build da imagem direto no VPS
+            docker build -t albums-api:$TAG .
 
+            # Blue/Green deployment
+            # Detecta qual está rodando atualmente
+            BLUE_RUNNING=$(docker ps --filter "name=api-blue" --filter "status=running" -q)
+            GREEN_RUNNING=$(docker ps --filter "name=api-green" --filter "status=running" -q)
+
+            if [ -n "$BLUE_RUNNING" ]; then
+              NEW_COLOR="green"
+              OLD_COLOR="blue"
+            else
+              NEW_COLOR="blue"
+              OLD_COLOR="green"
+            fi
+
+            echo "Deploying $NEW_COLOR, stopping $OLD_COLOR"
+
+            # Inicia o novo container
+            docker compose up -d api-$NEW_COLOR
+
+            # Espera o serviço subir
             sleep 10
 
-            curl -f http://localhost:3334/health
+            if [ "$NEW_COLOR" = "blue" ]; then
+              HEALTH_PORT=3333
+            else
+              HEALTH_PORT=3334
+            fi
 
-            sed -i 's/3333/3334/' /etc/nginx/conf.d/api.conf
-            nginx -s reload
+            # Healthcheck
+            if curl -f http://localhost:$HEALTH_PORT/health; then
+              echo "Healthcheck passed!"
 
-            docker compose stop api-blue
+              # Atualiza Nginx (usar conf separada evita substituir sempre)
+              cp /etc/nginx/conf.d/api-$NEW_COLOR.conf /etc/nginx/conf.d/api.conf
+              nginx -s reload
+
+              # Para o container antigo
+              docker compose stop api-$OLD_COLOR || true
+            else
+              echo "Healthcheck failed! Rolling back..."
+              docker compose stop api-$NEW_COLOR || true
+              exit 1
+            fi
