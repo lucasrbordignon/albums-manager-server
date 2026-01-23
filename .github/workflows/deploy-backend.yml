@@ -1,0 +1,42 @@
+name: Deploy API (Blue/Green)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          docker build -t albums-api:${{ github.sha }} .
+
+      - name: Push image
+        run: |
+          docker tag albums-api:${{ github.sha }} albums-api:latest
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: deploy
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            cd /var/www/albums-manager-api
+            export TAG=${{ github.sha }}
+
+            docker compose pull
+            docker compose up -d api-green
+
+            sleep 10
+
+            curl -f http://localhost:3334/health
+
+            sed -i 's/3333/3334/' /etc/nginx/conf.d/api.conf
+            nginx -s reload
+
+            docker compose stop api-blue
