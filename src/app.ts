@@ -7,6 +7,7 @@ import { albumsRoutes } from './modules/albums/albums.routes';
 import { usersRoutes } from './modules/users/users.routes';
 import { photosRoutes } from './modules/photos/photo.routes';
 import path from 'path/win32';
+import sharp from 'sharp';
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.use(
     immutable: true,
   })
 );
+
+console.log('Sharp OK:', sharp.versions);
 
 app.use(errorHandler)
 

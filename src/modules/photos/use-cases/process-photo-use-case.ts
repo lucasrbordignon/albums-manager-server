@@ -1,85 +1,86 @@
-import sharp from 'sharp';
-import { Vibrant } from 'node-vibrant/node';
-import crypto from 'crypto';
-import fs from 'fs/promises';
-import path from 'path';
-import { CreatePhotoUseCase } from './create-photo-use-case';
-import type { CreatePhotoDTO } from '../dtos/CreatePhotoDTO';
-import { PhotosRepository } from '../repositories/photo.repository';
+import sharp from 'sharp'
+import crypto from 'crypto'
+import fs from 'fs/promises'
+import path from 'path'
+import { CreatePhotoUseCase } from './create-photo-use-case'
+import type { CreatePhotoDTO } from '../dtos/CreatePhotoDTO'
 
 const uploadRoot =
-  process.env.UPLOAD_DIR ??
-  path.resolve(process.cwd(), 'uploads');
+  process.env.UPLOAD_DIR ?? path.resolve(process.cwd(), 'uploads')
 
 type Input = {
-  tempPath: string;
-  originalName: string;
-  userId: string;
-  albumId?: string;
-  acquiredAt?: string;
-};
+  tempPath: string
+  originalName: string
+  userId: string
+  albumId?: string
+  acquiredAt?: string
+}
 
 export class ProcessPhotoUseCase {
-  constructor(
-    private createPhotoUseCase: CreatePhotoUseCase,
-  ) {}
+  constructor(private createPhotoUseCase: CreatePhotoUseCase) {}
 
   async execute(input: Input) {
-    const buffer = await fs.readFile(input.tempPath);
+    let buffer: Buffer
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(buffer)
-      .digest('hex');
+    try {
+      buffer = await fs.readFile(input.tempPath)
 
-    const userDir = path.join(
-      uploadRoot,
-      'users',
-      input.userId,
-      'photos'
-    );
+      const image = sharp(buffer, { failOn: 'none' })
 
-    const thumbDir = path.join(userDir, 'thumbs');
+      const hash = crypto.createHash('sha256').update(buffer).digest('hex')
 
-    await fs.mkdir(userDir, { recursive: true });
-    await fs.mkdir(thumbDir, { recursive: true });
+      const userDir = path.join(uploadRoot, 'users', input.userId, 'photos')
+      const thumbDir = path.join(userDir, 'thumbs')
 
-    const fileName = `${hash}.webp`;
-    const imagePath = path.join(userDir, fileName);
-    const thumbPath = path.join(thumbDir, fileName);
+      await fs.mkdir(thumbDir, { recursive: true })
 
-    await sharp(buffer)
-      .resize({ width: 1200, withoutEnlargement: true })
-      .webp({ quality: 85 })
-      .toFile(imagePath);
+      const fileName = `${hash}.webp`
+      const imagePath = path.join(userDir, fileName)
+      const thumbPath = path.join(thumbDir, fileName)
 
-    await sharp(buffer)
-      .resize({ width: 300 })
-      .webp({ quality: 70 })
-      .toFile(thumbPath);
+      await image
+        .clone()
+        .resize({ width: 1200, withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toFile(imagePath)
 
-    const palette = await Vibrant.from(buffer).getPalette();
-    const dominantColor = palette.Vibrant?.hex ?? null;
+      await image
+        .clone()
+        .resize({ width: 300 })
+        .webp({ quality: 70 })
+        .toFile(thumbPath)
 
-    const stats = await fs.stat(imagePath);
+      const { dominant } = await sharp(imagePath).stats()
 
-    const data: CreatePhotoDTO = {
-      title: input.originalName,
-      albumId: input.albumId ?? '',
-      acquiredAt: input.acquiredAt
-        ? new Date(input.acquiredAt)
-        : new Date(),
-      sizeInBytes: stats.size,
-      mimeType: 'image/webp',
-      filePath: imagePath,
-      thumbnailPath: thumbPath,
-      dominantColor: dominantColor ?? undefined,
-    };
+      const dominantColor = dominant
+        ? `#${dominant.r.toString(16).padStart(2, '0')}${dominant.g
+            .toString(16)
+            .padStart(2, '0')}${dominant.b.toString(16).padStart(2, '0')}`
+        : undefined
 
-    const photo = await this.createPhotoUseCase.execute(data);
+      const stats = await fs.stat(imagePath)
 
-    await fs.unlink(input.tempPath).catch(() => {});
+      const data: CreatePhotoDTO = {
+        title: path.parse(input.originalName).name,
+        albumId: input.albumId,
+        acquiredAt: input.acquiredAt ? new Date(input.acquiredAt) : new Date(),
+        sizeInBytes: stats.size,
+        mimeType: 'image/webp',
+        filePath: imagePath,
+        thumbnailPath: thumbPath,
+        dominantColor
+      }
 
-    return photo;
+      return await this.createPhotoUseCase.execute(data)
+    } catch (error) {
+      console.error('PROCESS PHOTO ERROR:', error)
+
+      throw new (await import('@/shared/errors/AppError')).AppError(
+        'Erro ao processar a imagem',
+        500
+      )
+    } finally {
+      await fs.unlink(input.tempPath).catch(() => {})
+    }
   }
 }

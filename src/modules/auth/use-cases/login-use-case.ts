@@ -19,13 +19,13 @@ export class LoginUseCase {
     const user = await this.userRepository.findByEmail(email);
     
     if (!user) {
-      throw new AppError('Invalid credentials', 401);
+      throw new AppError('E-mail inválido', 401);
     }
 
     const passwordMatch = await comparePassword(password, user.password);
 
     if (!passwordMatch) {
-      throw new AppError('Invalid credentials', 401);
+      throw new AppError('Senha inválida', 401);
     }
 
     const token = generateToken({ sub: user.id, userId: user.id });

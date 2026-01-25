@@ -158,10 +158,45 @@ config/
 - Orquestra containers: app, db, redis
 - Define volumes, networks e variáveis de ambiente
 
-### Subindo o Projeto com Docker
-```bash
-docker-compose up --build
-```
+
+### Rodando o Projeto Localmente
+
+1. **Clone o repositório:**
+  ```bash
+  git clone <url-do-repo>
+  cd albums-manager-server
+  ```
+
+2. **Crie o arquivo `.env`:**
+  - Copie o exemplo se houver (`.env.example`) ou crie manualmente.
+  - Defina as variáveis essenciais, por exemplo:
+    ```env
+    TAG=latest
+    DATABASE_URL=postgresql://admin_albums:senha@localhost:5432/albums?schema=public
+    JWT_SECRET=sua_chave
+    REDIS_PASSWORD=sua_senha
+    # ...demais variáveis
+    ```
+
+3. **Build da imagem local:**
+  ```bash
+  docker build -t albums-api:latest .
+  ```
+
+4. **Suba os containers:**
+  ```bash
+  docker compose up -d --build
+  ```
+
+5. **Acesse a API:**
+  - Por padrão, a API estará disponível em http://localhost:3333
+
+6. **(Opcional) Rodando sem Docker:**
+  - Instale dependências: `npm ci` ou `yarn install`
+  - Gere Prisma Client: `npx prisma generate`
+  - Rode local: `yarn dev` ou `npm run dev`
+
+---
 
 ---
 
